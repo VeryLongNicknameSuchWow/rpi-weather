@@ -2,7 +2,7 @@ from urllib.request import urlopen
 from urllib.error import URLError
 from datetime import datetime
 import bme280
-import dht11
+import am2302
 import ds18b20
 import platform
 import pymysql
@@ -25,7 +25,7 @@ def get_data():
     if hostname == "rPi-01":
         data = ds18b20.get_data()["ds18b20"]
     elif hostname == "rPi-02":
-        data = dht11.get_data()["dht11"]
+        data = am2302.get_data()["am2302"]
     elif hostname == "rPi-03":
         data = bme280.get_data()["bme280"]
 
