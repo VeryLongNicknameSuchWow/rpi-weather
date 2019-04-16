@@ -4,10 +4,10 @@ from datetime import datetime
 import bme280
 import am2302
 import ds18b20
-import platform
 import pymysql
+import sys
 
-hostname = platform.node()
+action = sys.argv[1]
 
 
 def get_time():
@@ -22,22 +22,22 @@ def get_time():
 def get_data():
     data = None
 
-    if hostname == "rPi-01":
+    if action == "ds18b20":
         data = ds18b20.get_data()["ds18b20"]
-    elif hostname == "rPi-02":
+    elif action == "am2302":
         data = am2302.get_data()["am2302"]
-    elif hostname == "rPi-03":
+    elif action == "bme280":
         data = bme280.get_data()["bme280"]
 
     return data
 
 
 def sql_record():
-    if hostname == "rPi-01":
+    if action == "ds18b20":
         return "INSERT INTO `outside` (`temperature`, `datetime`) VALUES (%s, %s)"
-    elif hostname == "rPi-02":
+    elif action == "am2302":
         return "INSERT INTO `downstairs` (`humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s)"
-    elif hostname == "rPi-03":
+    elif action == "bme280":
         return "INSERT INTO `upstairs` (`pressure`, `humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s, %s)"
 
 
@@ -48,20 +48,20 @@ def save_data():
     while utc is None and retries < 10:
         utc = get_time()
     if utc is not None:
-        connection = pymysql.connect(host='rPi-01',
+        connection = pymysql.connect(host='weather-01',
                                      user='weather',
                                      password='letmein',
                                      db='weather')
         try:
             with connection.cursor() as cursor:
-                if hostname == "rPi-01":
+                if action == "ds18b20":
                     cursor.execute(sql_record(), (str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
-                elif hostname == "rPi-02":
+                elif action == "am2302":
                     cursor.execute(sql_record(), (str(data["humidity"]),
                                                   str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
-                elif hostname == "rPi-03":
+                elif action == "bme280":
                     cursor.execute(sql_record(), (str(data["pressure"]),
                                                   str(data["humidity"]),
                                                   str(data["temperature"]),

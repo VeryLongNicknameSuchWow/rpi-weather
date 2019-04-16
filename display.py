@@ -14,7 +14,7 @@ def get_data():
         "downstairs": "SELECT `temperature`, `humidity` FROM `downstairs` ORDER BY `id` DESC LIMIT 1",
         "upstairs": "SELECT `temperature`, `humidity`, `pressure` FROM `upstairs` ORDER BY `id` DESC LIMIT 1"
     }
-    connection = pymysql.connect(host='rPi-01',
+    connection = pymysql.connect(host='weather-01',
                                  user='weather',
                                  password='letmein',
                                  db='weather')
@@ -29,9 +29,9 @@ def get_data():
 
 
 def oled_object():
-    if hostname == "rPi-02":
+    if hostname == "weather-02":
         return sh1106(serial_interface=spi(), width=128, height=64, rotate=0)
-    elif hostname == "rPi-03":
+    elif hostname == "weather-01":
         return sh1106(serial_interface=i2c(), width=128, height=64, rotate=0)
 
 
