@@ -1,14 +1,41 @@
 from urllib.request import urlopen
 from urllib.error import URLError
 from datetime import datetime
+import argparse
 import bme280
 import am2302
 import ds18b20
 import dht11
 import pymysql
-import sys
 
-action = sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("-s", "--sensor",
+                    help="specify sensor type: ds18b20 am2302 dht11 bme280",
+                    action="store",
+                    dest="sensor",
+                    type=str,
+                    required=True)
+
+parser.add_argument("-p", "--pin",
+                    help="specify pin number for am2302 or dht11 sensor",
+                    action="store",
+                    dest="pin",
+                    type=int,
+                    default=4,
+                    required=False)
+
+parser.add_argument("-a", "--address",
+                    help="specify i2c address for bme280 sensor",
+                    action="store",
+                    dest="address",
+                    type=str,
+                    default=0x77,
+                    required=False)
+
+args = parser.parse_args()
+action = args.sensor
+pin = args.pin
+address = int(args.address, 16)
 
 
 def get_time():
@@ -26,11 +53,11 @@ def get_data():
     if action == "ds18b20":
         data = ds18b20.get_data()["ds18b20"]
     elif action == "am2302":
-        data = am2302.get_data()["am2302"]
+        data = am2302.get_data(pin)["am2302"]
     elif action == "dht11":
-        data = dht11.get_data()["dht11"]
+        data = dht11.get_data(pin)["dht11"]
     elif action == "bme280":
-        data = bme280.get_data()["bme280"]
+        data = bme280.get_data(address)["bme280"]
 
     return data
 
@@ -42,7 +69,7 @@ def sql_record():
     elif action == "bme280":
         return "INSERT INTO `upstairs` (`pressure`, `humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s, %s)"
 
-    else:
+    elif action == "dht11" or action == "am2303":
         return "INSERT INTO `downstairs` (`humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s)"
 
 
@@ -69,7 +96,7 @@ def save_data():
                                                   str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
 
-                else:
+                elif action == "dht11" or action == "am2303":
                     cursor.execute(sql_record(), (str(data["humidity"]),
                                                   str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
