@@ -9,12 +9,10 @@ import dht11
 import pymysql
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-s", "--sensor",
+parser.add_argument("sensor",
                     help="specify sensor type: ds18b20 am2302 dht11 bme280",
                     action="store",
-                    dest="sensor",
-                    type=str,
-                    required=True)
+                    type=str)
 
 parser.add_argument("-p", "--pin",
                     help="specify pin number for am2302 or dht11 sensor",
