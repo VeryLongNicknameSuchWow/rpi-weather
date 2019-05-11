@@ -4,6 +4,7 @@ from datetime import datetime
 import bme280
 import am2302
 import ds18b20
+import dht11
 import pymysql
 import sys
 
@@ -26,6 +27,8 @@ def get_data():
         data = ds18b20.get_data()["ds18b20"]
     elif action == "am2302":
         data = am2302.get_data()["am2302"]
+    elif action == "dht11":
+        data = dht11.get_data()["dht11"]
     elif action == "bme280":
         data = bme280.get_data()["bme280"]
 
@@ -35,10 +38,12 @@ def get_data():
 def sql_record():
     if action == "ds18b20":
         return "INSERT INTO `outside` (`temperature`, `datetime`) VALUES (%s, %s)"
-    elif action == "am2302":
-        return "INSERT INTO `downstairs` (`humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s)"
+
     elif action == "bme280":
         return "INSERT INTO `upstairs` (`pressure`, `humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s, %s)"
+
+    else:
+        return "INSERT INTO `downstairs` (`humidity`, `temperature`, `datetime`) VALUES (%s, %s, %s)"
 
 
 def save_data():
@@ -57,15 +62,18 @@ def save_data():
                 if action == "ds18b20":
                     cursor.execute(sql_record(), (str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
-                elif action == "am2302":
-                    cursor.execute(sql_record(), (str(data["humidity"]),
-                                                  str(data["temperature"]),
-                                                  utc.strftime('%Y-%m-%d %H:%M:%S')))
+
                 elif action == "bme280":
                     cursor.execute(sql_record(), (str(data["pressure"]),
                                                   str(data["humidity"]),
                                                   str(data["temperature"]),
                                                   utc.strftime('%Y-%m-%d %H:%M:%S')))
+
+                else:
+                    cursor.execute(sql_record(), (str(data["humidity"]),
+                                                  str(data["temperature"]),
+                                                  utc.strftime('%Y-%m-%d %H:%M:%S')))
+
             connection.commit()
         finally:
             connection.close()
