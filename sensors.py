@@ -29,7 +29,7 @@ parser.add_argument("-a", "--address",
                     action="store",
                     dest="address",
                     type=str,
-                    default=0x77,
+                    default="0x77",
                     required=False)
 
 args = parser.parse_args()
