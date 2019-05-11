@@ -10,12 +10,12 @@ import pymysql
 
 parser = argparse.ArgumentParser()
 parser.add_argument("sensor",
-                    help="specify sensor type: ds18b20 am2302 dht11 bme280",
+                    help="sensor type: ds18b20 am2302 dht11 bme280",
                     action="store",
                     type=str)
 
 parser.add_argument("-p", "--pin",
-                    help="specify pin number for am2302 or dht11 sensor",
+                    help="pin number for am2302 or dht11 sensor",
                     action="store",
                     dest="pin",
                     type=int,
@@ -23,7 +23,7 @@ parser.add_argument("-p", "--pin",
                     required=False)
 
 parser.add_argument("-a", "--address",
-                    help="specify i2c address for bme280 sensor",
+                    help="i2c address for bme280 sensor",
                     action="store",
                     dest="address",
                     type=str,
