@@ -31,9 +31,9 @@ def get_data():
 
 
 def oled_object():
-    if interface == "weather-02":
+    if interface == "spi":
         return sh1106(serial_interface=spi(), width=128, height=64, rotate=0)
-    elif interface == "weather-01":
+    elif interface == "i2c":
         return sh1106(serial_interface=i2c(), width=128, height=64, rotate=0)
 
 
