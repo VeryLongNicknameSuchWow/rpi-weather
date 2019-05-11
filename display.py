@@ -1,10 +1,12 @@
 import pymysql.cursors
-import platform
+import argparse
 from luma.core.interface.serial import i2c, spi
 from luma.core.render import canvas
 from luma.oled.device import sh1106
 
-hostname = platform.node()
+parser = argparse.ArgumentParser()
+parser.add_argument("interface", help="interface: i2c spi")
+interface = parser.parse_args().interface
 
 
 def get_data():
@@ -29,9 +31,9 @@ def get_data():
 
 
 def oled_object():
-    if hostname == "weather-02":
+    if interface == "weather-02":
         return sh1106(serial_interface=spi(), width=128, height=64, rotate=0)
-    elif hostname == "weather-01":
+    elif interface == "weather-01":
         return sh1106(serial_interface=i2c(), width=128, height=64, rotate=0)
 
 
